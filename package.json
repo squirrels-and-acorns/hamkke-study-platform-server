@@ -1,0 +1,23 @@
+{
+  "name": "hamkke-study-platform-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/squirrels-and-acorns/hamkke-study-platform-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/squirrels-and-acorns/hamkke-study-platform-server/issues"
+  },
+  "homepage": "https://github.com/squirrels-and-acorns/hamkke-study-platform-server#readme",
+  "dependencies": {
+    "express": "^4.17.2"
+  }
+}
