@@ -19,9 +19,9 @@ app.use(helmet());
 // cors
 
 app.get('/', (req, res) => {
-  return res.send('Welcome Hamkke!!!')
-})
+  return res.send('Welcome Hamkke!!!');
+});
 
-app.listen(5001, () => {
+app.listen(5002, () => {
   console.log('Connected...');
-})
+});
