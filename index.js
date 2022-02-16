@@ -8,7 +8,6 @@ const helmet = require('helmet');
 const userRouter = require('./router/userRouter');
 const sequelize = require('./models').sequelize;
 
-
 const app = express();
 
 // json parser
@@ -26,11 +25,11 @@ app.use(helmet());
 sequelize.sync({ alter: true });
 
 app.get('/', (req, res) => {
-  return res.send('Welcome Hamkke!!!');
+	return res.send('Welcome Hamkke!!!');
 });
 
-app.use('/users', userRouter);
+app.use('/api/users', userRouter);
 
 app.listen(5002, () => {
-  console.log('Connected...');
+	console.log('Connected...');
 });
