@@ -17,5 +17,14 @@ module.exports = (sequelize, DataTypes) => {
 			modelName: 'User',
 		},
 	);
+
+  User.static.find = () => {
+
+  }
+
+  User.static.compare = () => {
+    
+  }
+
 	return User;
 };
