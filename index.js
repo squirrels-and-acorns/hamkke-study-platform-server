@@ -21,12 +21,14 @@ app.use(morgan('dev'));
 // security header
 app.use(helmet());
 // cors
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true,
-}));
+app.use(
+	cors({
+		origin: 'http://localhost:3000',
+		credentials: true,
+	}),
+);
 
-sequelize.sync({ alter: true });
+sequelize.sync({ force: true });
 
 app.get('/', (req, res) => {
 	return res.send('Welcome Hamkke!!!');

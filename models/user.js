@@ -8,23 +8,17 @@ module.exports = (sequelize, DataTypes) => {
 	}
 	User.init(
 		{
-			email: DataTypes.STRING,
-			password: DataTypes.STRING,
-			nickname: DataTypes.STRING,
+			email: { type: DataTypes.STRING, allowNull: false },
+			password: { type: DataTypes.STRING, allowNull: false },
+			nickname: { type: DataTypes.STRING, allowNull: false },
+			profile: { type: DataTypes.STRING, allowNull: true },
+			removed: DataTypes.BOOLEAN,
 		},
 		{
 			sequelize,
 			modelName: 'User',
 		},
 	);
-
-  User.static.find = () => {
-
-  }
-
-  User.static.compare = () => {
-    
-  }
 
 	return User;
 };
