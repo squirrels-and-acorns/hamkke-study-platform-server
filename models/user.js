@@ -2,7 +2,7 @@ const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
 	class User extends Model {
-		static associate(models) {
+		static associate(/* models */) {
 			// define association here
 		}
 	}
@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
 			password: { type: DataTypes.STRING, allowNull: false },
 			nickname: { type: DataTypes.STRING, allowNull: false },
 			profile: { type: DataTypes.STRING, allowNull: true },
+			stacks: { type: DataTypes.STRING, allowNull: true},
 			removed: DataTypes.BOOLEAN,
 		},
 		{

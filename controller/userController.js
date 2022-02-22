@@ -1,74 +1,142 @@
+const { validationResult } = require('express-validator');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const db = require('../models');
+
+const User = db.User;
+const saltRounds = 10;
+
 const loginUser = async (req, res) => {
-	// 로그인 로직
-	const { email, password } = req.body;
 	try {
-		// 1. 아이디 디비에 있는지 확인한다.
+		const { email, password } = req.body;
 		const findUser = await User.findOne({ where: { email } });
 
 		if (!findUser) {
-			// 1-1. 없다면 -> 401 -> 존재하지않는 이메일 입니다.
-			return res.status(409).json({ message: '존재하지 않는 이메일 입니다.' });
+			return res.status(409).json({ success: false, message: '존재하지 않는 이메일 입니다.' });
 		}
 
-		const {
-			dataValues: { password: dbPassword },
-		} = findUser;
+		const { dataValues } = findUser;
 
-		// 2. 비밀번호 확인한다. (받은 패스워드 암호화 해서 비교하기)
-		bcrypt.compare(password, dbPassword, (err, isMatch) => {
+		return bcrypt.compare(password, dataValues.password, (err, isMatch) => {
 			if (isMatch) {
-				// 3. 토큰을 생성한다.
-				const token = jwt.sign({ ...findUser, password: '' }, 'hello', {
+				const token = jwt.sign({ ...dataValues, password: '' }, 'hello', {
 					expiresIn: '1h',
 				});
-				// 4. 클라이언트 쿠키에 토큰을 저장하고, 유저 정보를 응답으로 보내준다.
-				const { id, email, nickname } = findUser;
+				const { id, email, nickname, profile, stacks } = findUser;
 
 				return res
 					.cookie('TID', token)
 					.status(200)
-					.json({ id, email, nickname });
+					.json({ id, email, nickname, profile, stacks: stacks && stacks.split(',') });
+			} else {
+				return res.status(400).json({ success: false, message: '비밀번호가 틀립니다' });
 			}
-			// 2-1. 없다면 -> 401 -> 비밀번호가 틀립니다.
 		});
-	} catch (error) {}
+	} catch (error) {
+		return res.status(506).send('Failed Login');
+	}
 };
 
-const registerUser = (req, res) => {
+const registerUser = async (req, res) => {
 	const errors = validationResult(req);
 	if (!errors.isEmpty()) {
 		return res.status(401).json({ errors: errors.array() });
 	}
+	try {
+		const { email, password: plainPassword, nickname } = req.body;
 
-	const { email, password: plainPassword, nickname } = req.body;
-	// 2. 디비에 존재하는 아이디인지 확인
-	User.findOne({ where: { email } })
-		.then((data) => {
-			if (data) {
-				// 2-1. 존재한다면 -> 409 -> 이미 존재하는 이메일 입니다.
-				return res.status(409).json({ message: '존재하는 이메일 입니다.' });
+		const data = await User.findOne({ where: { email } });
+		if (data) {
+			return res.status(409).json({ success: false, message: '존재하는 이메일 입니다.' });
+		}
+		return bcrypt.genSalt(saltRounds, (err, salt) => {
+			if (err) {
+				return res.send('서버 에러 잠시 후 시도해주세요!');
 			}
-			// 3. 비밀번호 Bcrypt로 암호화
-			bcrypt.genSalt(saltRounds, (err, salt) => {
+			return bcrypt.hash(plainPassword, salt, (err, hashPassword) => {
 				if (err) {
 					return res.send('서버 에러 잠시 후 시도해주세요!');
 				}
-				bcrypt.hash(plainPassword, salt, (err, hashPassword) => {
-					if (err) {
-						return res.send('서버 에러 잠시 후 시도해주세요!');
-					}
-					// 4. 데이터 베이스 저장
-					User.create({ email, password: hashPassword, nickname }).then(() => {
-						// 5. 성공했다고 응답
-						return res.status(201).json({ success: true });
-					});
+				User.create({ email, password: hashPassword, nickname }).then(() => {
+					return res.status(201).json({ success: true });
 				});
 			});
-		})
-		.catch((error) => {
-			// 에러 발생
-			return res.status(500).json({ message: '서버 에러' });
 		});
+	} catch (error) {
+		return res.status(506).json({ success: false, message: 'Failed Register' });
+	}
 };
 
-module.exports = { loginUser, registerUser };
+const updateUser = async (req, res) => {
+	const {
+		body: { userId, type, data },
+	} = req;
+	try {
+		switch (type) {
+			// 1. 닉네임 변경
+			case 'nickname': {
+				const result = await User.findOne({ where: { nickname: data } });
+
+				if (result) {
+					return res.status(400).json({ success: false, message: '존재하는 닉네임' });
+				}
+
+				await User.update({ nickname: data }, { where: { id: userId } });
+				return res.status(200).json({ success: true });
+			}
+			// 2. 비밀번호 변경
+			case 'password': {
+				const {
+					dataValues: { password: dbPassword },
+				} = await User.findOne({ where: { id: userId } });
+
+				return bcrypt.compare(data, dbPassword, (err, isMatch) => {
+					if (isMatch) {
+						return res.status(400).json({ success: false, message: '이전 비밀번호와 같습니다.' });
+					} else {
+						return bcrypt.genSalt(saltRounds, (err, salt) => {
+							return bcrypt.hash(data, salt, async (err, hashPassword) => {
+								await User.update({ password: hashPassword }, { where: { id: userId } });
+								return res.status(200).json({ success: true });
+							});
+						});
+					}
+				});
+			}
+			// 3. 관심있는 언어
+			case 'stacks': {
+				const stacksArrayToString = data.toString();
+				const [result] = await User.update({ stacks: stacksArrayToString }, { where: { id: userId } });
+				if (result) {
+					return res.status(200).json({ success: true });
+				} else {
+					return res.status(400).json({ success: false, message: '일치하는 userId가 없음' });
+				}
+			}
+			default:
+				return res.status(400).json({ message: '잘못된 요청 값' });
+		}
+	} catch (error) {
+		return res.status(500).json({ message: 'Server Error', error });
+	}
+};
+
+const uploadUserProfile = async (req, res) => {
+	try {
+		const image = req.file.location;
+		const { userId } = req.query;
+		if (image === undefined) {
+			return res.status(400).json({ message: '이미지가 존재하지 않습니다.' });
+		}
+		const [ result ] = await User.update({ profile: image }, { where: { id: userId } });
+		if(result) {
+			return res.status(200).json({ success: true, image });
+		} else {
+			return res.status(400).json({ success: false, message: "존재하지 않는 userId" });
+		}
+	} catch (error) {
+		return res.status(500).json({ message: '서버 에러 잠시후 다시 시도 요망, 지속적인 에러는 서버 개발자에게 문의' });
+	}
+};
+
+module.exports = { loginUser, registerUser, updateUser, uploadUserProfile };
