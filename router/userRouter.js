@@ -4,7 +4,7 @@ const { body } = require('express-validator');
 const router = express.Router();
 const upload = require('../module/multer');
 
-const { loginUser, registerUser, updateUser, uploadUserProfile } = require('../controller/userController');
+const { loginUser, registerUser, updateUser, uploadUserProfile, deleteUser } = require('../controller/userController');
 
 router.post('/login', loginUser);
 
@@ -19,5 +19,7 @@ router.post(
 router.put('/', updateUser);
 
 router.post('/profile', upload.single('image'), uploadUserProfile);
+
+router.delete('/', deleteUser)
 
 module.exports = router;

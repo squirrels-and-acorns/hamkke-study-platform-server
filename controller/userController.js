@@ -128,15 +128,29 @@ const uploadUserProfile = async (req, res) => {
 		if (image === undefined) {
 			return res.status(400).json({ message: '이미지가 존재하지 않습니다.' });
 		}
-		const [ result ] = await User.update({ profile: image }, { where: { id: userId } });
-		if(result) {
+		const [result] = await User.update({ profile: image }, { where: { id: userId } });
+		if (result) {
 			return res.status(200).json({ success: true, image });
 		} else {
-			return res.status(400).json({ success: false, message: "존재하지 않는 userId" });
+			return res.status(400).json({ success: false, message: '존재하지 않는 userId' });
 		}
 	} catch (error) {
 		return res.status(500).json({ message: '서버 에러 잠시후 다시 시도 요망, 지속적인 에러는 서버 개발자에게 문의' });
 	}
 };
 
-module.exports = { loginUser, registerUser, updateUser, uploadUserProfile };
+const deleteUser = async (req, res) => {
+	try {
+		const { userId } = req.query;
+		const result = await User.destroy({ where: { id: userId } });
+		if (result) {
+			return res.clearCookie('TID').status(200).json({ success: true });
+		} else {
+			return res.status(400).json({ success: false, message: '존재하지 않는 사용자 입니다.' });
+		}
+	} catch (error) {
+		return res.status(500).json({ message: '서버 에러' });
+	}
+};
+
+module.exports = { loginUser, registerUser, updateUser, uploadUserProfile, deleteUser };
