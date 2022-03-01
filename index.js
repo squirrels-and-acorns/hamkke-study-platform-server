@@ -6,6 +6,7 @@ const helmet = require('helmet');
 
 //local
 const userRouter = require('./router/userRouter');
+const postRouter = require('./router/postRouter');
 const sequelize = require('./models').sequelize;
 
 const app = express();
@@ -31,10 +32,11 @@ app.use(
 sequelize.sync({ force: true });
 
 app.get('/', (req, res) => {
-	return res.send('Welcome Hamkke!!!');
+	return res.send('Welcome Hamkke');
 });
 
 app.use('/api/users', userRouter);
+app.use('/api/post', postRouter);
 
 app.listen(5002, () => {
 	console.log('Connected...');
