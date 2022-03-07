@@ -5,12 +5,15 @@ const router = express.Router();
 const upload = require('../module/multer');
 
 const {
+	authCheck,
 	loginUser,
 	registerUser,
 	updateUser,
 	uploadUserProfile,
 	deleteUser,
 } = require('../controller/userController');
+
+router.get('/auth', authCheck);
 
 router.post('/login', loginUser);
 

@@ -6,6 +6,39 @@ const db = require('../models');
 const User = db.User;
 const saltRounds = 10;
 
+const authCheck = async (req, res) => {
+	try {
+		// token decode
+		const token = req.cookies.TID;
+		// token에 있는 userId가 디비에 존재하는 것인지
+		if (token) {
+			const { email } = jwt.verify(token, 'quokka');
+			const response = await User.findOne({ where: { email } });
+
+			console.log(response);
+
+			if (response) {
+				const {
+					email: userEmail,
+					nickname,
+					profile,
+					stacks,
+					createdAt,
+				} = response;
+				return res.status(200).json({
+					success: true,
+					user: { email: userEmail, nickname, profile, stacks, createdAt },
+				});
+			}
+			return res
+				.status(400)
+				.json({ success: false, message: '유효하지 않는 토큰입니다.' });
+		}
+	} catch (error) {
+		return res.status(500).send('Server Error...');
+	}
+};
+
 const loginUser = async (req, res) => {
 	try {
 		const { email, password } = req.body;
@@ -21,7 +54,7 @@ const loginUser = async (req, res) => {
 
 		return bcrypt.compare(password, dataValues.password, (err, isMatch) => {
 			if (isMatch) {
-				const token = jwt.sign({ ...dataValues, password: '' }, 'hello', {
+				const token = jwt.sign({ ...dataValues, password: '' }, 'quokka', {
 					expiresIn: '1h',
 				});
 				const { id, email, nickname, profile, stacks } = findUser;
@@ -207,6 +240,7 @@ const deleteUser = async (req, res) => {
 };
 
 module.exports = {
+	authCheck,
 	loginUser,
 	registerUser,
 	updateUser,
