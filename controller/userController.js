@@ -15,10 +15,9 @@ const authCheck = async (req, res) => {
 			const { email } = jwt.verify(token, 'quokka');
 			const response = await User.findOne({ where: { email } });
 
-			console.log(response);
-
 			if (response) {
 				const {
+					id,
 					email: userEmail,
 					nickname,
 					profile,
@@ -27,7 +26,7 @@ const authCheck = async (req, res) => {
 				} = response;
 				return res.status(200).json({
 					success: true,
-					user: { email: userEmail, nickname, profile, stacks, createdAt },
+					user: { id, email: userEmail, nickname, profile, stacks, createdAt },
 				});
 			}
 			return res
