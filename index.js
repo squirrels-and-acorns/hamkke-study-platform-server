@@ -32,7 +32,7 @@ app.use(
 sequelize.sync({ force: true });
 
 app.get('/', (req, res) => {
-	return res.send('Welcome Hamkke');
+	return res.send('Welcome Hamkke!!');
 });
 
 app.use('/api/users', userRouter);
