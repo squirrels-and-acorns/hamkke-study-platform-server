@@ -55,16 +55,7 @@ const getPosts = async (req, res) => {
 	try {
 		const { query } = req;
 		const { tags } = query;
-		const posts = await Post.findAll({
-			include: [
-				{
-					model: User,
-					as: 'user',
-					attributes: ['id', 'nickname'],
-				},
-			],
-			attributes: { exclude: ['userId'] },
-		});
+		const posts = await Post.findAll({ attributes: ["id", "title", "stacks", "createdAt", "updatedAt"] });
 
 
 
