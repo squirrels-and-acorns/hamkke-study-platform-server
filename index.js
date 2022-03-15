@@ -38,7 +38,7 @@ app.use(
 	swaggerUi.setup(specs),
 );
 
-sequelize.sync({ force: true });
+sequelize.sync({ alter: true });
 
 app.get('/', (req, res) => {
 	return res.send('Welcome Hamkke!!');
