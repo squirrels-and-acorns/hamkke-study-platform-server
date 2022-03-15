@@ -3,13 +3,17 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const helmet = require('helmet');
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsDoc = require('swagger-jsdoc');
 
 //local
+const swaggerOptions = require('./swagger.js');
 const userRouter = require('./router/userRouter');
 const postRouter = require('./router/postRouter');
 const sequelize = require('./models').sequelize;
 
 const app = express();
+const specs = swaggerJsDoc(swaggerOptions);
 
 // json parser
 app.use(express.json());
@@ -27,6 +31,11 @@ app.use(
 		origin: 'http://localhost:3000',
 		credentials: true,
 	}),
+);
+app.use(
+	'/swagger',
+	swaggerUi.serve,
+	swaggerUi.setup(specs),
 );
 
 sequelize.sync({ force: true });

@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
 			Post.belongsTo(models.User, {
 				foreignKey: 'userId',
 				as: 'user',
-				onDelete: 'SET NULL',
+				onDelete: 'cascade',
 			});
 		}
 	}
@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
 		{
 			title: { type: DataTypes.STRING, allowNull: false },
 			contents: { type: DataTypes.STRING, allowNull: false },
-			tags: { type: DataTypes.STRING, allowNull: false },
+			stacks: { type: DataTypes.STRING, allowNull: false },
 		},
 		{
 			sequelize,

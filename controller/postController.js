@@ -1,21 +1,23 @@
 const db = require('../models');
-
+ 
 const Post = db.Post;
 const User = db.User;
 
 const createPost = async (req, res) => {
 	try {
 		const { title, contents, tags, userId } = req.body;
+		const stacks = tags.join(',');
 
 		await Post.create({
 			title,
 			contents,
 			userId,
-			tags: tags.join(','),
+			stacks
 		});
 
 		return res.status(200).json({ success: true });
 	} catch (error) {
+		console.log(error);
 		return res.status(400).json({ success: false, error });
 	}
 };
@@ -24,10 +26,8 @@ const updatePost = async (req, res) => {
 	try {
 		const { postId: id, title, contents, tags } = req.body;
 
-		await Post.update(
-			{ title, contents, tags: tags.join(',') },
-			{ where: { id } },
-		);
+		await Post.update({ title, contents, stacks: tags.join(',') }, { where: { id } });
+
 		return res.status(200).json({ success: true });
 	} catch (error) {
 		return res.status(400).json({ success: false, error });
@@ -53,6 +53,8 @@ const deletePost = async (req, res) => {
 
 const getPosts = async (req, res) => {
 	try {
+		const { query } = req;
+		const { tags } = query;
 		const posts = await Post.findAll({
 			include: [
 				{
@@ -63,8 +65,32 @@ const getPosts = async (req, res) => {
 			],
 			attributes: { exclude: ['userId'] },
 		});
-		return res.status(200).json({ posts });
+
+
+
+		const convertPosts = posts.map(post => {
+			post.stacks = post.stacks.split(',');
+			return post;
+		})
+		let result;
+		if(tags) {
+			const tagHash = {};
+
+			tags.forEach(tag => {
+				tagHash[tag] = 1;
+			})
+
+			result = convertPosts.filter(post => {
+				return post.stacks.find(stack => stack in tagHash);
+			})
+
+		}
+
+
+
+		return res.status(200).json({ posts: result ? result : convertPosts, tags });
 	} catch (error) {
+		console.log(error);
 		return res.status(500).json({ message: 'DB Connect Fail...', error });
 	}
 };
@@ -87,6 +113,7 @@ const getPost = async (req, res) => {
 		});
 
 		if (post) {
+			post.stacks = post.stacks.split(',');
 			return res.status(200).json({ post });
 		} else {
 			return res.status(400).json({ message: '잘못된 Post Id' });

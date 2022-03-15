@@ -14,7 +14,7 @@ module.exports = {
       contents: {
         type: Sequelize.STRING
       },
-      tags: {
+      stack: {
         type: Sequelize.STRING
       },
       createdAt: {
@@ -27,7 +27,7 @@ module.exports = {
       }
     });
   },
-  async down(queryInterface, Sequelize) {
+  async down(queryInterface) {
     await queryInterface.dropTable('Posts');
   }
 };

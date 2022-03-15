@@ -17,6 +17,12 @@ module.exports = {
       nickname: {
         type: Sequelize.STRING
       },
+      profile: {
+        type: Sequelize.STRING
+      },
+      stacks: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -27,7 +33,7 @@ module.exports = {
       }
     });
   },
-  async down(queryInterface, Sequelize) {
+  async down(queryInterface) {
     await queryInterface.dropTable('Users');
   }
 };

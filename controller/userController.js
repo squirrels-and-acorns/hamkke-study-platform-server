@@ -29,10 +29,11 @@ const authCheck = async (req, res) => {
 					user: { id, email: userEmail, nickname, profile, stacks, createdAt },
 				});
 			}
-			return res
-				.status(400)
-				.json({ success: false, message: '유효하지 않는 토큰입니다.' });
+			
 		}
+		return res
+				.status(401)
+				.json({ success: false, message: '유효하지 않는 토큰입니다.' });
 	} catch (error) {
 		return res.status(500).send('Server Error...');
 	}
