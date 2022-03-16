@@ -1,5 +1,5 @@
 const db = require('../models');
- 
+
 const Post = db.Post;
 const User = db.User;
 
@@ -12,7 +12,7 @@ const createPost = async (req, res) => {
 			title,
 			contents,
 			userId,
-			stacks
+			stacks,
 		});
 
 		return res.status(200).json({ success: true });
@@ -26,7 +26,10 @@ const updatePost = async (req, res) => {
 	try {
 		const { postId: id, title, contents, stacks: tag } = req.body;
 
-		await Post.update({ title, contents, stacks: tag.join(',') }, { where: { id } });
+		await Post.update(
+			{ title, contents, stacks: tag.join(',') },
+			{ where: { id } },
+		);
 
 		return res.status(200).json({ success: true });
 	} catch (error) {
@@ -54,32 +57,39 @@ const deletePost = async (req, res) => {
 const getPosts = async (req, res) => {
 	try {
 		const { query } = req;
-		const { stacks: tag } = query;
-		const posts = await Post.findAll({ attributes: ["id", "title", "stacks", "createdAt", "updatedAt"] });
+		const { stacks: tag, limit, page } = query;
+		const startIndex = (+page - 1) * limit;
+		const endIndex = +page * limit;
+		const posts = await Post.findAll({
+			order: [['id', 'DESC']],
+			attributes: ['id', 'title', 'stacks', 'createdAt', 'updatedAt'],
+		});
 
-
-
-		const convertPosts = posts.map(post => {
+		const convertPosts = posts.map((post) => {
 			post.stacks = post.stacks.split(',');
 			return post;
-		})
+		});
+
 		let result;
-		if(tag) {
+
+		if (tag) {
 			const tagHash = {};
 
-			tag.forEach(tag => {
+			tag.forEach((tag) => {
 				tagHash[tag] = 1;
-			})
+			});
 
-			result = convertPosts.filter(post => {
-				return post.stacks.find(stack => stack in tagHash);
-			})
-
+			result = convertPosts.filter((post) => {
+				return post.stacks.find((stack) => stack in tagHash);
+			});
+			console.log(limit, page);
+			console.log(startIndex, endIndex);
+			result = result.slice(startIndex, endIndex);
 		}
 
+		const result2 = convertPosts.slice(startIndex, endIndex);
 
-
-		return res.status(200).json({ posts: result ? result : convertPosts });
+		return res.status(200).json({ posts: result ? result : result2 });
 	} catch (error) {
 		console.log(error);
 		return res.status(500).json({ message: 'DB Connect Fail...', error });

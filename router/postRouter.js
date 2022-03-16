@@ -29,6 +29,16 @@ const {
  *           description: 언어 스택
  *           schema:
  *             type: array
+ *         - in: query
+ *           name: limit
+ *           description: 게시글 갯수
+ *           schema:
+ *             type: number
+ *         - in: query
+ *           name: page
+ *           description: 페이지
+ *           schema:
+ *             type: number
  *       responses:
  *         "200":
  *           description: 조회 성공
