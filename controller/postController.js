@@ -70,8 +70,6 @@ const getPosts = async (req, res) => {
 			return post;
 		});
 
-		let result;
-
 		if (tag) {
 			const tagHash = {};
 
@@ -79,17 +77,18 @@ const getPosts = async (req, res) => {
 				tagHash[tag] = 1;
 			});
 
-			result = convertPosts.filter((post) => {
+			const filterPosts = convertPosts.filter((post) => {
 				return post.stacks.find((stack) => stack in tagHash);
 			});
-			console.log(limit, page);
-			console.log(startIndex, endIndex);
-			result = result.slice(startIndex, endIndex);
+			const resultPosts = filterPosts.slice(startIndex, endIndex);
+			const isLastPost = !filterPosts[endIndex];
+			return res.status(200).json({ posts: resultPosts, isLastPost });
 		}
 
-		const result2 = convertPosts.slice(startIndex, endIndex);
+		const resultPosts = convertPosts.slice(startIndex, endIndex);
+		const isLastPost = !convertPosts[endIndex];
 
-		return res.status(200).json({ posts: result ? result : result2 });
+		return res.status(200).json({ posts: resultPosts, isLastPost });
 	} catch (error) {
 		console.log(error);
 		return res.status(500).json({ message: 'DB Connect Fail...', error });
