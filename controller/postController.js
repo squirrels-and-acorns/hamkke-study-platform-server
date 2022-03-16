@@ -5,8 +5,8 @@ const User = db.User;
 
 const createPost = async (req, res) => {
 	try {
-		const { title, contents, tags, userId } = req.body;
-		const stacks = tags.join(',');
+		const { title, contents, stacks: tag, userId } = req.body;
+		const stacks = tag.join(',');
 
 		await Post.create({
 			title,
@@ -24,9 +24,9 @@ const createPost = async (req, res) => {
 
 const updatePost = async (req, res) => {
 	try {
-		const { postId: id, title, contents, tags } = req.body;
+		const { postId: id, title, contents, stacks: tag } = req.body;
 
-		await Post.update({ title, contents, stacks: tags.join(',') }, { where: { id } });
+		await Post.update({ title, contents, stacks: tag.join(',') }, { where: { id } });
 
 		return res.status(200).json({ success: true });
 	} catch (error) {
@@ -54,7 +54,7 @@ const deletePost = async (req, res) => {
 const getPosts = async (req, res) => {
 	try {
 		const { query } = req;
-		const { tags } = query;
+		const { stacks: tag } = query;
 		const posts = await Post.findAll({ attributes: ["id", "title", "stacks", "createdAt", "updatedAt"] });
 
 
@@ -64,10 +64,10 @@ const getPosts = async (req, res) => {
 			return post;
 		})
 		let result;
-		if(tags) {
+		if(tag) {
 			const tagHash = {};
 
-			tags.forEach(tag => {
+			tag.forEach(tag => {
 				tagHash[tag] = 1;
 			})
 
@@ -79,7 +79,7 @@ const getPosts = async (req, res) => {
 
 
 
-		return res.status(200).json({ posts: result ? result : convertPosts, tags });
+		return res.status(200).json({ posts: result ? result : convertPosts });
 	} catch (error) {
 		console.log(error);
 		return res.status(500).json({ message: 'DB Connect Fail...', error });
