@@ -57,12 +57,21 @@ const deletePost = async (req, res) => {
 const getPosts = async (req, res) => {
 	try {
 		const { query } = req;
-		const { stacks: tag, limit, page } = query;
+		const { stacks: tag, limit, page, completed = false } = query;
 		const startIndex = (+page - 1) * limit;
 		const endIndex = +page * limit;
 		const posts = await Post.findAll({
 			order: [['id', 'DESC']],
-			attributes: ['id', 'title', 'stacks', 'createdAt', 'updatedAt'],
+			attributes: [
+				'id',
+				'title',
+				'stacks',
+				'hit',
+				'completed',
+				'createdAt',
+				'updatedAt',
+			],
+			where: { completed },
 		});
 
 		const convertPosts = posts.map((post) => {
@@ -123,4 +132,35 @@ const getPost = async (req, res) => {
 	}
 };
 
-module.exports = { createPost, updatePost, deletePost, getPost, getPosts };
+const updateCompletePost = async (req, res) => {
+	try {
+		const { params } = req;
+		const { id } = params;
+
+		// 조회
+		const post = await Post.findOne({ where: { id } });
+		console.log(post);
+		// 업데이트
+		const [result] = await Post.update(
+			{ completed: !post.completed },
+			{ where: { id } },
+		);
+
+		if (result) {
+			return res
+				.status(200)
+				.json({ success: true, completed: !post.completed });
+		}
+	} catch (error) {
+		return res.status(500).json({ success: false, message: 'ServerError' });
+	}
+};
+
+module.exports = {
+	createPost,
+	updatePost,
+	deletePost,
+	getPost,
+	getPosts,
+	updateCompletePost,
+};

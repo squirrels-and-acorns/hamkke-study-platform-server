@@ -6,6 +6,7 @@ const {
 	deletePost,
 	getPost,
 	getPosts,
+	updateCompletePost,
 } = require('../controller/postController');
 
 /**
@@ -205,5 +206,34 @@ router.put('', updatePost);
  *                     type: boolean
  */
 router.delete('/:id', deletePost);
+
+/**
+ * @swagger
+ * paths:
+ *   /api/post/complete/:id:
+ *     put:
+ *       summary: "게시글 모집 상태 변경"
+ *       description: "게시글 상태 변경 요청ㄴ"
+ *       tags: [Post]
+ *       parameters:
+ *         - in: params
+ *           name: postId
+ *           description: 포스트 아이디
+ *           schema:
+ *             type: number
+ *       responses:
+ *         "200":
+ *           description: 변경 완료
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: boolean
+ *                   completed:
+ *                     type: boolean
+ */
+router.put('/completed/:id', updateCompletePost)
 
 module.exports = router;

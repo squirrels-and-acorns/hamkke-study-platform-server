@@ -14,6 +14,7 @@ const sequelize = require('./models').sequelize;
 
 const app = express();
 const specs = swaggerJsDoc(swaggerOptions);
+const PORT = 5002;
 
 // json parser
 app.use(express.json());
@@ -38,7 +39,7 @@ app.use(
 	swaggerUi.setup(specs),
 );
 
-sequelize.sync({ alter: true });
+sequelize.sync({ force: true });
 
 app.get('/', (req, res) => {
 	return res.send('Welcome Hamkke!!');
@@ -47,6 +48,7 @@ app.get('/', (req, res) => {
 app.use('/api/users', userRouter);
 app.use('/api/post', postRouter);
 
-app.listen(5002, () => {
+app.listen(PORT, () => {
 	console.log('Connected...');
+	console.log(`PORT is ${PORT}`)
 });

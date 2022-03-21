@@ -15,6 +15,8 @@ module.exports = (sequelize, DataTypes) => {
 			title: { type: DataTypes.STRING, allowNull: false },
 			contents: { type: DataTypes.STRING(1500), allowNull: false },
 			stacks: { type: DataTypes.STRING, allowNull: false },
+			hit: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0},
+			completed: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false},
 		},
 		{
 			sequelize,
