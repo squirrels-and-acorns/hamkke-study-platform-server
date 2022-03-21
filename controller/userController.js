@@ -26,7 +26,7 @@ const authCheck = async (req, res) => {
 				} = response;
 				return res.status(200).json({
 					success: true,
-					user: { id, email: userEmail, nickname, profile, stacks, createdAt },
+					user: { id, email: userEmail, nickname, profile, stacks: stacks && stacks.split(','), createdAt },
 				});
 			}
 			
