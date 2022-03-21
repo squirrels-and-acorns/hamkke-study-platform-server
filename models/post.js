@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
 	Post.init(
 		{
 			title: { type: DataTypes.STRING, allowNull: false },
-			contents: { type: DataTypes.STRING, allowNull: false },
+			contents: { type: DataTypes.STRING(1500), allowNull: false },
 			stacks: { type: DataTypes.STRING, allowNull: false },
 		},
 		{
