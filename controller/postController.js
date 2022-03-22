@@ -139,7 +139,6 @@ const updateCompletePost = async (req, res) => {
 
 		// 조회
 		const post = await Post.findOne({ where: { id } });
-		console.log(post);
 		// 업데이트
 		const [result] = await Post.update(
 			{ completed: !post.completed },

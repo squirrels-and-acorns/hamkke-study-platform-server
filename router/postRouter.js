@@ -40,6 +40,11 @@ const {
  *           description: 페이지
  *           schema:
  *             type: number
+ *         - in: query
+ *           name: completed
+ *           description: 모집완료 여부
+ *           schema:
+ *             type: boolean
  *       responses:
  *         "200":
  *           description: 조회 성공
