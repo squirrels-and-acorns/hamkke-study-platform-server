@@ -128,7 +128,9 @@ const getPost = async (req, res) => {
 		});
 
 		if (post) {
+			await Post.update({ hit: post.hit + 1 }, {where: {id}});
 			post.stacks = post.stacks.split(',');
+			post.hit++;
 			return res.status(200).json({ post });
 		} else {
 			return res.status(400).json({ message: '잘못된 Post Id' });
