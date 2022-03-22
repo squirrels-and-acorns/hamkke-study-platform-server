@@ -215,7 +215,7 @@ router.delete('/:id', deletePost);
 /**
  * @swagger
  * paths:
- *   /api/post/complete/:id:
+ *   /api/post/completed/:id:
  *     put:
  *       summary: "게시글 모집 상태 변경"
  *       description: "게시글 상태 변경 요청ㄴ"
