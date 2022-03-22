@@ -58,10 +58,9 @@ const getPosts = async (req, res) => {
 	try {
 		const { query } = req;
 		const { stacks: tag, limit, page, completed = false } = query;
-		
 		const startIndex = (+page - 1) * limit;
 		const endIndex = +page * limit;
-
+		const completedConvert = completed === 'true' ? true : false;
 		const findAllOptions = {
 			order: [['id', 'DESC']],
 			attributes: [
@@ -75,8 +74,8 @@ const getPosts = async (req, res) => {
 			],
 		};
 
-		if(!completed) {
-			findAllOptions.where = { completed };
+		if(!completedConvert) {
+			findAllOptions['where'] = { completed: completedConvert };
 		}
 
 		const posts = await Post.findAll(findAllOptions);
