@@ -58,9 +58,11 @@ const getPosts = async (req, res) => {
 	try {
 		const { query } = req;
 		const { stacks: tag, limit, page, completed = false } = query;
+		
 		const startIndex = (+page - 1) * limit;
 		const endIndex = +page * limit;
-		const posts = await Post.findAll({
+
+		const findAllOptions = {
 			order: [['id', 'DESC']],
 			attributes: [
 				'id',
@@ -71,8 +73,13 @@ const getPosts = async (req, res) => {
 				'createdAt',
 				'updatedAt',
 			],
-			where: { completed },
-		});
+		};
+
+		if(!completed) {
+			findAllOptions.where = { completed };
+		}
+
+		const posts = await Post.findAll(findAllOptions);
 
 		const convertPosts = posts.map((post) => {
 			post.stacks = post.stacks.split(',');
