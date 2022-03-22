@@ -57,8 +57,8 @@ const {
  *                     type: array
  *                     example:
  *                       [
- *                         { "id": 2, "title": "Test Title", "stacks": [ "js", "ts", "java"], "createdAt": "2022-03-15T15:56:20.000Z", "updatedAt": "2022-03-15T15:56:20.000Z"},
- *                         { "id": 3, "title": "자바공부하실분", "stacks": [ "js", "ts", "java"], "createdAt": "2022-03-15T15:56:20.000Z", "updatedAt": "2022-03-15T15:56:20.000Z"}
+ *                         { "id": 2, "title": "Test Title", "stacks": [ "js", "ts", "java"], hit: 0, completed: true, "createdAt": "2022-03-15T15:56:20.000Z", "updatedAt": "2022-03-15T15:56:20.000Z"},
+ *                         { "id": 3, "title": "자바공부하실분", "stacks": [ "js", "ts", "java"], hit: 5, completed: false, "createdAt": "2022-03-15T15:56:20.000Z", "updatedAt": "2022-03-15T15:56:20.000Z"}
  *                       ]
  */
 router.get('', getPosts);
@@ -93,6 +93,8 @@ router.get('', getPosts);
  *                         "title": "Test Title",
  *                         "contents": "Test Content",
  *                         "stacks": [ "js", "ts", "java" ],
+ *                         "hit": 20,
+ *                         "complegted": false,
  *                         "createdAt": "2022-03-15T15:56:20.000Z",
  *                         "updatedAt": "2022-03-15T15:56:20.000Z",
  *                         "user": {
