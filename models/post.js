@@ -8,6 +8,10 @@ module.exports = (sequelize, DataTypes) => {
 				as: 'user',
 				onDelete: 'cascade',
 			});
+			Post.hasMany(models.Like, {
+				foreignKey: 'postId',
+				as: 'like',
+			});
 		}
 	}
 	Post.init(

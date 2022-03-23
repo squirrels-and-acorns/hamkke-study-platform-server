@@ -7,6 +7,7 @@ const {
 	getPost,
 	getPosts,
 	updateCompletePost,
+	likePost,
 } = require('../controller/postController');
 
 /**
@@ -225,7 +226,7 @@ router.delete('/:id', deletePost);
  *   /api/post/completed/:id:
  *     put:
  *       summary: "게시글 모집 상태 변경"
- *       description: "게시글 상태 변경 요청ㄴ"
+ *       description: "게시글 상태 변경 요청"
  *       tags: [Post]
  *       parameters:
  *         - in: params
@@ -246,6 +247,43 @@ router.delete('/:id', deletePost);
  *                   completed:
  *                     type: boolean
  */
-router.put('/completed/:id', updateCompletePost)
+router.put('/completed/:id', updateCompletePost);
+
+/**
+ * @swagger
+ * paths:
+ *   /api/post/like:
+ *     post:
+ *       summary: "게시글 좋아요 / 좋아요 취소"
+ *       description: "게시글 좋아요 기능"
+ *       tags: [Post]
+ *       requestBody:
+ *         description: 게시글 아이디, 유저 아이디를 전달합니다.
+ *         required: true
+ *         content:
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 postId:
+ *                   type: number
+ *                   description: 포스트 아이디
+ *                 userId:
+ *                   type: number
+ *                   description: 유저 아이디
+ *       responses:
+ *         "200":
+ *           description: 좋아요 성공 / 취소
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: boolean
+ *                   like:
+ *                     type: boolean
+ */
+router.post('/like', likePost)
 
 module.exports = router;

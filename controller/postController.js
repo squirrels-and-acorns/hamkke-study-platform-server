@@ -1,7 +1,10 @@
 const db = require('../models');
 
+// 리스트 , 상세, 좋아요
+
 const Post = db.Post;
 const User = db.User;
+const Like = db.Like;
 
 const createPost = async (req, res) => {
 	try {
@@ -87,10 +90,14 @@ const getPosts = async (req, res) => {
 
 		const posts = await Post.findAll(findAllOptions);
 
-		const convertPosts = posts.map((post) => {
-			post.stacks = post.stacks.split(',');
-			return post;
-		});
+		const convertPosts = await Promise.all(
+			posts.map(async (post) => {
+				const { dataValues } = post;
+				dataValues.like = await Like.count({ where: { postId: post.id } });
+				dataValues.stacks = dataValues.stacks.split(',');
+				return dataValues;
+			}),
+		);
 
 		if (tag) {
 			const tagHash = {};
@@ -122,7 +129,7 @@ const getPost = async (req, res) => {
 		const { params } = req;
 		const { id } = params;
 
-		const post = await Post.findOne({
+		const { dataValues } = await Post.findOne({
 			include: [
 				{
 					model: User,
@@ -134,11 +141,14 @@ const getPost = async (req, res) => {
 			attributes: { exclude: ['userId'] },
 		});
 
-		if (post) {
-			await Post.update({ hit: post.hit + 1 }, { where: { id } });
-			post.stacks = post.stacks.split(',');
-			post.hit++;
-			return res.status(200).json({ post });
+		const like = await Like.count({ where: { postId: dataValues.id } });
+
+		if (dataValues) {
+			await Post.update({ hit: dataValues.hit + 1 }, { where: { id } });
+			dataValues.stacks = dataValues.stacks.split(',');
+			dataValues.hit++;
+			dataValues.like = like;
+			return res.status(200).json({ dataValues });
 		} else {
 			return res.status(400).json({ message: '잘못된 Post Id' });
 		}
@@ -170,6 +180,26 @@ const updateCompletePost = async (req, res) => {
 	}
 };
 
+const likePost = async (req, res) => {
+	try {
+		// Like에 해당하는 postId, userId 있는지 확인
+		//   - 있으면 delete , { success: true, like: false }
+		//   - 없으면 create , { success: true, like: true }
+		const { userId, postId } = req.body;
+		const like = await Like.findOne({ where: { userId, postId } });
+
+		if (like) {
+			await Like.destroy({ where: { postId, userId } });
+			res.status(200).json({ success: true, like: false });
+		} else {
+			await Like.create({ postId, userId });
+			res.status(200).json({ success: true, like: true });
+		}
+	} catch (error) {
+		return res.status(500).json({ success: false, message: 'Sever Error' });
+	}
+};
+
 module.exports = {
 	createPost,
 	updatePost,
@@ -177,4 +207,5 @@ module.exports = {
 	getPost,
 	getPosts,
 	updateCompletePost,
+	likePost,
 };
