@@ -148,7 +148,7 @@ const getPost = async (req, res) => {
 			dataValues.stacks = dataValues.stacks.split(',');
 			dataValues.hit++;
 			dataValues.like = like;
-			return res.status(200).json({ dataValues });
+			return res.status(200).json({ post: dataValues });
 		} else {
 			return res.status(400).json({ message: '잘못된 Post Id' });
 		}
