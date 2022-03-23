@@ -45,6 +45,11 @@ const {
  *           description: 모집완료 여부
  *           schema:
  *             type: boolean
+ *         - in: query
+ *           name: sort
+ *           description: 정렬
+ *           schema:
+ *             type: string
  *       responses:
  *         "200":
  *           description: 조회 성공

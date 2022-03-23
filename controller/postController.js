@@ -57,12 +57,19 @@ const deletePost = async (req, res) => {
 const getPosts = async (req, res) => {
 	try {
 		const { query } = req;
-		const { stacks: tag, limit, page, completed = false } = query;
+		const {
+			stacks: tag,
+			limit,
+			page,
+			sort = 'recent',
+			completed = false,
+		} = query;
 		const startIndex = (+page - 1) * limit;
 		const endIndex = +page * limit;
 		const completedConvert = completed === 'true' ? true : false;
+		const order = [sort === 'recent' ? ['id', 'DESC'] : ['hit', 'DESC']];
 		const findAllOptions = {
-			order: [['id', 'DESC']],
+			order,
 			attributes: [
 				'id',
 				'title',
@@ -74,7 +81,7 @@ const getPosts = async (req, res) => {
 			],
 		};
 
-		if(!completedConvert) {
+		if (!completedConvert) {
 			findAllOptions['where'] = { completed: completedConvert };
 		}
 
@@ -128,7 +135,7 @@ const getPost = async (req, res) => {
 		});
 
 		if (post) {
-			await Post.update({ hit: post.hit + 1 }, {where: {id}});
+			await Post.update({ hit: post.hit + 1 }, { where: { id } });
 			post.stacks = post.stacks.split(',');
 			post.hit++;
 			return res.status(200).json({ post });
