@@ -144,7 +144,7 @@ const getPost = async (req, res) => {
 		});
 
 		const like = await Like.count({ where: { postId: dataValues.id } });
-		const isLike = await Like.findOne({ where: { postId, userId } });
+		const isLike = userId && await Like.findOne({ where: { postId, userId } });
 
 		if (dataValues) {
 			await Post.update({ hit: dataValues.hit + 1 }, { where: { id: postId } });
