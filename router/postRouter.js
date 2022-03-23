@@ -79,8 +79,13 @@ router.get('', getPosts);
  *       tags: [Post]
  *       parameters:
  *         - in: params
- *           name: postId
+ *           name: id(postId)
  *           description: 포스트 아이디
+ *           schema:
+ *             type: number
+ *         - in: query
+ *           name: userId
+ *           description: 유저 아이디
  *           schema:
  *             type: number
  *       responses:
@@ -101,6 +106,7 @@ router.get('', getPosts);
  *                         "stacks": [ "js", "ts", "java" ],
  *                         "hit": 20,
  *                         "like": 5, 
+ *                         "isLike": true,
  *                         "completed": false,
  *                         "createdAt": "2022-03-15T15:56:20.000Z",
  *                         "updatedAt": "2022-03-15T15:56:20.000Z",

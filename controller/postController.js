@@ -127,7 +127,9 @@ const getPosts = async (req, res) => {
 const getPost = async (req, res) => {
 	try {
 		const { params } = req;
-		const { id } = params;
+		const { query } = req;
+		const { id: postId } = params;
+		const { userId } = query;
 
 		const { dataValues } = await Post.findOne({
 			include: [
@@ -137,17 +139,19 @@ const getPost = async (req, res) => {
 					attributes: ['id', 'nickname'],
 				},
 			],
-			where: { id },
+			where: { id: postId },
 			attributes: { exclude: ['userId'] },
 		});
 
 		const like = await Like.count({ where: { postId: dataValues.id } });
+		const isLike = await Like.findOne({ where: { postId, userId } });
 
 		if (dataValues) {
-			await Post.update({ hit: dataValues.hit + 1 }, { where: { id } });
+			await Post.update({ hit: dataValues.hit + 1 }, { where: { id: postId } });
 			dataValues.stacks = dataValues.stacks.split(',');
 			dataValues.hit++;
 			dataValues.like = like;
+			dataValues.isLike = !!isLike;
 			return res.status(200).json({ post: dataValues });
 		} else {
 			return res.status(400).json({ message: '잘못된 Post Id' });
