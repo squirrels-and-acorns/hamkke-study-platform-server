@@ -11,6 +11,10 @@ module.exports = (sequelize, DataTypes) => {
 				foreignKey: 'userId',
 				as: 'like',
 			});
+			User.hasMany(models.Reply, {
+				foreignKey: 'userId',
+				as: 'reply',
+			});
 		}
 	}
 	User.init(

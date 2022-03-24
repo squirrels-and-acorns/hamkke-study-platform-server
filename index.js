@@ -10,6 +10,7 @@ const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerOptions = require('./swagger.js');
 const userRouter = require('./router/userRouter');
 const postRouter = require('./router/postRouter');
+const replyRouter = require('./router/replyRouter');
 const sequelize = require('./models').sequelize;
 
 const app = express();
@@ -47,6 +48,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/users', userRouter);
 app.use('/api/post', postRouter);
+app.use('/api/reply', replyRouter)
 
 app.listen(PORT, () => {
 	console.log('Connected...');
