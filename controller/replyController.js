@@ -19,11 +19,11 @@ const getReply = async (req, res) => {
 				const { userId } = dataValues;
 
 				const user = await User.findOne({ where: { id: userId } });
-        const { dataValues: data } = user;
-        const { nickname } = data;
-        
-        dataValues.nickname = nickname;
-        return dataValues;
+				const { dataValues: data } = user;
+				const { nickname } = data;
+
+				dataValues.nickname = nickname;
+				return dataValues;
 			}),
 		);
 
@@ -49,4 +49,48 @@ const createReply = async (req, res) => {
 	}
 };
 
-module.exports = { getReply, createReply };
+const updateReply = async (req, res) => {
+	try {
+		const { replyId, contents } = req.body;
+
+		const [success] = await Reply.update(
+			{ contents },
+			{ where: { id: replyId } },
+		);
+		if (success) {
+			return res.status(200).json({ success: true });
+		}
+		return res.status(400).json({
+			success: false,
+			message: '유효하지 않는 값입니다(댓글 아이디 또는 내용)',
+		});
+	} catch (error) {
+		console.log(error);
+		return res.status(500).json({ success: false, message: '서버에러' });
+	}
+};
+
+const deleteReply = async (req, res) => {
+	try {
+		const { query } = req;
+		const { replyId } = query;
+
+		const result = await Reply.destroy({ where: { id: replyId } });
+
+		if (result) {
+			return res.status(200).json({ success: true });
+		} else {
+			return res
+				.status(400)
+				.json({
+					success: false,
+					message: '잘못된 댓글 아이디 또는 이미 삭제된 댓글 입니다',
+				});
+		}
+	} catch (error) {
+		console.log(error);
+		return res.status(500).json({ success: false, message: '서버에러' });
+	}
+};
+
+module.exports = { getReply, createReply, updateReply, deleteReply };

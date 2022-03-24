@@ -1,5 +1,5 @@
 const express = require('express');
-const { getReply, createReply } = require('../controller/replyController');
+const { getReply, createReply, updateReply, deleteReply } = require('../controller/replyController');
 const router = express.Router();
 
 /**
@@ -88,5 +88,71 @@ router.get('/', getReply);
  *                       { id: 0, postId: 0, userId: 0, nickname: 'quokka', contents: '댓글 테스트', createdAt: '생성날짜', updatedAt: '업데이트 날짜' }
  */
 router.post('/', createReply);
+
+/**
+ * @swagger
+ * paths:
+ *   /api/reply/:
+ *     put:
+ *       summary: "댓글 수정"
+ *       description: "댓글 수정 요청"
+ *       tags: [Reply]
+ *       requestBody:
+ *         description: 생성할 댓글 정보
+ *         required: true
+ *         content:
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 replyId:
+ *                   type: number
+ *                   description: 댓글 아이디
+ *                 contents:
+ *                   type: string
+ *                   description: 댓글 내용
+ *       responses:
+ *         "200":
+ *           description: 수정 성공
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: boolean
+ *                     example:
+ *                       true
+ */
+router.put('/', updateReply);
+
+/**
+ * @swagger
+ * paths:
+ *   /api/reply/:
+ *     delete:
+ *       summary: "댓글 삭제"
+ *       description: "댓글 삭제 요청"
+ *       tags: [Reply]
+ *       parameters:
+ *         - in: query
+ *           name: replyId
+ *           description: 댓글 아이디
+ *           schema:
+ *             type: number
+ *       responses:
+ *         "200":
+ *           description: 삭제 성공
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: boolean
+ *                     example:
+ *                       true
+ */
+router.delete('/', deleteReply);
 
 module.exports = router;
