@@ -15,15 +15,13 @@ const getReply = async (req, res) => {
 
 		const convertReplyList = await Promise.all(
 			reply.map(async (rp) => {
-				const { dataValues } = rp;
-				const { userId } = dataValues;
+				const reply = rp.dataValues;
+				const userId = reply.userId;
+				const data = await User.findOne({ where: { id: userId } });
+				const user = data && data.dataValues;
+				reply.nickname = user?.nickname;
 
-				const user = await User.findOne({ where: { id: userId } });
-				const { dataValues: data } = user;
-				const { nickname } = data;
-
-				dataValues.nickname = nickname;
-				return dataValues;
+				return reply;
 			}),
 		);
 
@@ -80,12 +78,10 @@ const deleteReply = async (req, res) => {
 		if (result) {
 			return res.status(200).json({ success: true });
 		} else {
-			return res
-				.status(400)
-				.json({
-					success: false,
-					message: '잘못된 댓글 아이디 또는 이미 삭제된 댓글 입니다',
-				});
+			return res.status(400).json({
+				success: false,
+				message: '잘못된 댓글 아이디 또는 이미 삭제된 댓글 입니다',
+			});
 		}
 	} catch (error) {
 		console.log(error);

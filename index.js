@@ -34,11 +34,7 @@ app.use(
 		credentials: true,
 	}),
 );
-app.use(
-	'/swagger',
-	swaggerUi.serve,
-	swaggerUi.setup(specs),
-);
+app.use('/swagger', swaggerUi.serve, swaggerUi.setup(specs));
 
 sequelize.sync({ alter: true });
 
@@ -48,9 +44,9 @@ app.get('/', (req, res) => {
 
 app.use('/api/users', userRouter);
 app.use('/api/post', postRouter);
-app.use('/api/reply', replyRouter)
+app.use('/api/reply', replyRouter);
 
 app.listen(PORT, () => {
 	console.log('Connected...');
-	console.log(`PORT is ${PORT}`)
+	console.log(`PORT is ${PORT}`);
 });
