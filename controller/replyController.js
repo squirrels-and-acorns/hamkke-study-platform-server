@@ -76,7 +76,7 @@ const deleteReply = async (req, res) => {
 		const result = await Reply.destroy({ where: { id: replyId } });
 
 		if (result) {
-			return res.status(200).json({ success: true });
+			return res.status(200).json({ success: true, replyId });
 		} else {
 			return res.status(400).json({
 				success: false,
