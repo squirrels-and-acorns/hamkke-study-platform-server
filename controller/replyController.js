@@ -11,7 +11,7 @@ const getReply = async (req, res) => {
 		const { query } = req;
 		const { postId } = query;
 
-		const reply = await Reply.findAll({ where: { postId } });
+		const reply = await Reply.findAll({ where: { postId }, order: [['id', 'DESC']] });
 
 		const convertReplyList = await Promise.all(
 			reply.map(async (rp) => {
@@ -24,6 +24,8 @@ const getReply = async (req, res) => {
 				return reply;
 			}),
 		);
+
+		convertReplyList.sort((a, b) => a - b);
 
 		res.status(200).json({ success: true, reply: convertReplyList });
 	} catch (error) {

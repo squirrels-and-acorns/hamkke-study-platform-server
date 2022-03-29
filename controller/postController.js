@@ -5,6 +5,7 @@ const db = require('../models');
 const Post = db.Post;
 const User = db.User;
 const Like = db.Like;
+const Reply = db.Reply;
 
 const createPost = async (req, res) => {
 	try {
@@ -94,6 +95,7 @@ const getPosts = async (req, res) => {
 			posts.map(async (post) => {
 				const { dataValues } = post;
 				dataValues.like = await Like.count({ where: { postId: post.id } });
+				dataValues.comment = await Reply.count({ where : { postId: post.id}});
 				dataValues.stacks = dataValues.stacks.split(',');
 				return dataValues;
 			}),
