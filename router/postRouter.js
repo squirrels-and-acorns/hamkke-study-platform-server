@@ -8,6 +8,7 @@ const {
 	getPosts,
 	updateCompletePost,
 	likePost,
+	getLikePosts,
 } = require('../controller/postController');
 
 /**
@@ -63,8 +64,8 @@ const {
  *                     type: array
  *                     example:
  *                       [
- *                         { "id": 2, "title": "Test Title", "stacks": [ "js", "ts", "java"], hit: 0, like: 5, completed: true, "createdAt": "2022-03-15T15:56:20.000Z", "updatedAt": "2022-03-15T15:56:20.000Z"},
- *                         { "id": 3, "title": "자바공부하실분", "stacks": [ "js", "ts", "java"], hit: 5, like: 1, completed: false, "createdAt": "2022-03-15T15:56:20.000Z", "updatedAt": "2022-03-15T15:56:20.000Z"}
+ *                         { "id": 2, "title": "Test Title", "stacks": [ "js", "ts", "java"], hit: 0, like: 5, comment: 0, completed: true, "createdAt": "2022-03-15T15:56:20.000Z", "updatedAt": "2022-03-15T15:56:20.000Z"},
+ *                         { "id": 3, "title": "자바공부하실분", "stacks": [ "js", "ts", "java"], hit: 5, like: 1, comment: 0, completed: false, "createdAt": "2022-03-15T15:56:20.000Z", "updatedAt": "2022-03-15T15:56:20.000Z"}
  *                       ]
  */
 router.get('', getPosts);
@@ -105,7 +106,7 @@ router.get('', getPosts);
  *                         "contents": "Test Content",
  *                         "stacks": [ "js", "ts", "java" ],
  *                         "hit": 20,
- *                         "like": 5, 
+ *                         "like": 5,
  *                         "isLike": true,
  *                         "completed": false,
  *                         "createdAt": "2022-03-15T15:56:20.000Z",
@@ -291,6 +292,48 @@ router.put('/completed/:id', updateCompletePost);
  *                   like:
  *                     type: boolean
  */
-router.post('/like', likePost)
+router.post('/like', likePost);
+
+/**
+ * @swagger
+ * paths:
+ *   /api/post/like/me:
+ *     get:
+ *       summary: "내가 좋아요 한 게시글 리스트"
+ *       description: "내가 좋아요 한 게시글 리스"
+ *       tags: [Post]
+ *       parameters:
+ *         - in: query
+ *           name: limit
+ *           description: 게시글 갯수
+ *           schema:
+ *             type: number
+ *         - in: query
+ *           name: page
+ *           description: 페이지
+ *           schema:
+ *             type: number
+ *         - in: query
+ *           name: userId
+ *           description: 유저 아이디
+ *           schema:
+ *             type: number
+ *       responses:
+ *         "200":
+ *           description: 조회 성공
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   posts:
+ *                     type: array
+ *                     example:
+ *                       [
+ *                         { "id": 2, "title": "Test Title", "stacks": [ "js", "ts", "java"], hit: 0, like: 5, comment: 2, completed: true, "createdAt": "2022-03-15T15:56:20.000Z", "updatedAt": "2022-03-15T15:56:20.000Z"},
+ *                         { "id": 3, "title": "자바공부하실분", "stacks": [ "js", "ts", "java"], hit: 5, like: 1, comment: 0, completed: false, "createdAt": "2022-03-15T15:56:20.000Z", "updatedAt": "2022-03-15T15:56:20.000Z"}
+ *                       ]
+ */
+router.get('/like/me', getLikePosts);
 
 module.exports = router;

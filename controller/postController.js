@@ -95,7 +95,7 @@ const getPosts = async (req, res) => {
 			posts.map(async (post) => {
 				const { dataValues } = post;
 				dataValues.like = await Like.count({ where: { postId: post.id } });
-				dataValues.comment = await Reply.count({ where : { postId: post.id}});
+				dataValues.comment = await Reply.count({ where: { postId: post.id } });
 				dataValues.stacks = dataValues.stacks.split(',');
 				return dataValues;
 			}),
@@ -146,7 +146,8 @@ const getPost = async (req, res) => {
 		});
 
 		const like = await Like.count({ where: { postId: dataValues.id } });
-		const isLike = userId && await Like.findOne({ where: { postId, userId } });
+		const isLike =
+			userId && (await Like.findOne({ where: { postId, userId } }));
 
 		if (dataValues) {
 			await Post.update({ hit: dataValues.hit + 1 }, { where: { id: postId } });
@@ -188,9 +189,6 @@ const updateCompletePost = async (req, res) => {
 
 const likePost = async (req, res) => {
 	try {
-		// Like에 해당하는 postId, userId 있는지 확인
-		//   - 있으면 delete , { success: true, like: false }
-		//   - 없으면 create , { success: true, like: true }
 		const { userId, postId } = req.body;
 		const like = await Like.findOne({ where: { userId, postId } });
 
@@ -202,7 +200,47 @@ const likePost = async (req, res) => {
 			res.status(200).json({ success: true, like: true });
 		}
 	} catch (error) {
+		console.log(error);
 		return res.status(500).json({ success: false, message: 'Sever Error' });
+	}
+};
+
+const getLikePosts = async (req, res) => {
+	try {
+		const { query } = req;
+		const { limit, page, userId } = query;
+		const posts = await Post.findAll({
+			include: [
+				{
+					model: Like,
+					as: 'like',
+					where: { userId: userId },
+					attributes: [],
+					order: [['id', 'DESC']],
+				},
+			],
+		});
+
+		const startIndex = (page - 1) * limit;
+		const endIndex = page * limit;
+		const lastPage = !posts[endIndex];
+		const convertPosts = posts.slice(startIndex, endIndex);
+
+		const post = await Promise.all(
+			convertPosts.map(async (post) => {
+				const { dataValues } = post;
+				const { id } = dataValues;
+
+				dataValues.like = await Like.count({ where: { postId: id } });
+				dataValues.comment = await Reply.count({ where: { postId: id } });
+				return dataValues;
+			}),
+		);
+
+		return res.status(200).json({ success: true, posts: post, lastPage });
+	} catch (error) {
+		console.log(error);
+		return res.status(500).json({ success: false, error });
 	}
 };
 
@@ -212,6 +250,7 @@ module.exports = {
 	deletePost,
 	getPost,
 	getPosts,
+	getLikePosts,
 	updateCompletePost,
 	likePost,
 };
