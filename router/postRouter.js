@@ -9,6 +9,7 @@ const {
 	updateCompletePost,
 	likePost,
 	getLikePosts,
+	getWritePostListByMe,
 } = require('../controller/postController');
 
 /**
@@ -335,5 +336,37 @@ router.post('/like', likePost);
  *                       ]
  */
 router.get('/like/me', getLikePosts);
+
+/**
+ * @swagger
+ * paths:
+ *   /api/post/write/me:
+ *     get:
+ *       summary: "내가 작성한 게시글 리스트"
+ *       description: "내가 작성한 게시글 리스트"
+ *       tags: [Post]
+ *       parameters:
+ *         - in: query
+ *           name: userId
+ *           description: 유저 아이디
+ *           schema:
+ *             type: number
+ *       responses:
+ *         "200":
+ *           description: 조회 성공
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   posts:
+ *                     type: array
+ *                     example:
+ *                       [
+ *                         { "id": 2, "title": "Test Title", "stacks": [ "js", "ts", "java"], hit: 0, like: 5, comment: 2, completed: true, "createdAt": "2022-03-15T15:56:20.000Z", "updatedAt": "2022-03-15T15:56:20.000Z"},
+ *                         { "id": 3, "title": "자바공부하실분", "stacks": [ "js", "ts", "java"], hit: 5, like: 1, comment: 0, completed: false, "createdAt": "2022-03-15T15:56:20.000Z", "updatedAt": "2022-03-15T15:56:20.000Z"}
+ *                       ]
+ */
+router.get('/write/me', getWritePostListByMe);
 
 module.exports = router;

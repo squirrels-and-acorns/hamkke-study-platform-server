@@ -244,6 +244,32 @@ const getLikePosts = async (req, res) => {
 	}
 };
 
+const getWritePostListByMe = async (req, res) => {
+	try {
+		const { userId } = req.query;
+
+		const posts = await Post.findAll({
+			where: { userId },
+			order: [['id', 'DESC']],
+		});
+
+		const post = await Promise.all(
+			posts.map(async (post) => {
+				const { dataValues } = post;
+				const { id } = dataValues;
+
+				dataValues.like = await Like.count({ where: { postId: id } });
+				dataValues.comment = await Reply.count({ where: { postId: id } });
+				return dataValues;
+			}),
+		);
+
+		return res.status(200).json({ success: true, posts: post });
+	} catch (error) {
+		return res.status(500).json({ success: false, error });
+	}
+};
+
 module.exports = {
 	createPost,
 	updatePost,
@@ -251,6 +277,7 @@ module.exports = {
 	getPost,
 	getPosts,
 	getLikePosts,
+	getWritePostListByMe,
 	updateCompletePost,
 	likePost,
 };
