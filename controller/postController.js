@@ -231,6 +231,7 @@ const getLikePosts = async (req, res) => {
 				const { dataValues } = post;
 				const { id } = dataValues;
 
+				dataValues.stacks = dataValues.stacks.split(',');
 				dataValues.like = await Like.count({ where: { postId: id } });
 				dataValues.comment = await Reply.count({ where: { postId: id } });
 				return dataValues;
@@ -258,6 +259,7 @@ const getWritePostListByMe = async (req, res) => {
 				const { dataValues } = post;
 				const { id } = dataValues;
 
+				dataValues.stacks = dataValues.stacks.split(',');
 				dataValues.like = await Like.count({ where: { postId: id } });
 				dataValues.comment = await Reply.count({ where: { postId: id } });
 				return dataValues;
